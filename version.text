@@ -1,0 +1,11 @@
+2.4
+.....
+####UPDATE_DeveloperGuide
+changeCssVersion
+CpyBuildFilesWithoutLocaleFolderIn_frontendFolder
+CpyBackendAppRoutesIn_backendFolder
+MkZipAndPutItInMainFile
+TranslatelanguageBugFix
+addedMoreTranslatableText
+DemoProductAdded
+ProductSeparateVariationPrice
