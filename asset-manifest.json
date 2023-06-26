@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/static/css/main.aabd3020.css",
+    "main.js": "/static/js/main.b9eaae7c.js",
+    "static/media/template2.png": "/static/media/template2.a860723aea63b59ecd2d.png",
+    "static/media/template1.png": "/static/media/template1.0ecc76ac95ea3d722a98.png",
+    "static/media/img4.png": "/static/media/img4.ab3f5df2dff0d6d899f1.png",
+    "static/media/waiter.jpg": "/static/media/waiter.8eba7d44a73a6997ba2b.jpg",
+    "static/media/img2.png": "/static/media/img2.d7527feca97d047f0749.png",
+    "static/media/img1.png": "/static/media/img1.17e71c19f8cb11fd19b0.png",
+    "index.html": "/index.html",
+    "static/media/chevronDown.svg": "/static/media/chevronDown.fcff8d196847be1045415458a6cc03e2.svg",
+    "static/media/chevronUp.svg": "/static/media/chevronUp.b84ff639f6e91bcb9806ab6d4d38d15c.svg",
+    "static/media/rolling.svg": "/static/media/rolling.b9b7517931dcab8267ad4dc36bd3ed16.svg",
+    "static/media/getFetch.cjs": "/static/media/getFetch.ec9d976b83c54460de98.cjs",
+    "main.aabd3020.css.map": "/static/css/main.aabd3020.css.map",
+    "main.b9eaae7c.js.map": "/static/js/main.b9eaae7c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.aabd3020.css",
+    "static/js/main.b9eaae7c.js"
+  ]
+}
