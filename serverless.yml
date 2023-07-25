@@ -1,36 +1,11 @@
-service: food-000000
+service: food-111111
 provider:
     name: aws
     region: eu-west-1
-    environment:
-        APP_STORAGE: '/tmp'
-        API_URL: !GetAtt HttpApi.ApiEndpoint
-        APP_CODE: 000000
 
-        # AWS_DEFAULT_REGION: ${aws:region}
-        #FILESYSTEM_DISK: s3
-        #AWS_BUCKET: !Ref Storage
-        #AWS_DEFAULT_REGION: eu-west-1 
-
-        FILESYSTEM_DISK: cloudinary
-        CLOUDINARY_API_KEY: 864154425886371
-        CLOUDINARY_API_SECRET: zYgNZSdyMUx_aECBf33B3vIZXys
-        CLOUDINARY_CLOUD_NAME: djpgewc3b
-        CLOUDINARY_SECURE: true
-
-        ASSET_URL: ${construct:landing.cname}
         
 plugins:
-    - ./vendor/bref/bref
     - serverless-lift
-
-functions:
-    api:
-      handler: public/index.php
-      runtime: php-81-fpm
-      timeout: 28 # in seconds (API Gateway has a timeout of 29 seconds)
-      events:
-          - httpApi: '*'
 
 # Exclude files from deployment
 package:
@@ -44,12 +19,8 @@ package:
 constructs:
     landing:
         type: single-page-app
-        path: public
+        path: ""
             
-resources:
-  Outputs:
-    MyEndpointName:
-      Description: HTTP Endpoint for MyEndpoint lambda
-      Value: !GetAtt HttpApi.ApiEndpoint
+
 
 	
