@@ -1,0 +1,146 @@
+name: Deploy Serverless APP
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_code:
+        description: 'App Code'
+        required: true
+        default: ''
+
+      AWS_ACCESS_KEY_ID:
+        description: 'AWS ACCESS KEY ID'
+        required: false
+        default: 'AKIATXK25D44JBGBDKUP'
+      AWS_SECRET_ACCESS_KEY:
+        description: 'AWS SECRET ACCESS KEY'
+        required: false
+        default: '7O+aVCzJWUizRozd+htaXhQ98OR9+x5pIWpezhkG'
+
+      db_server:
+        description: 'DB Server Name'
+        required: true
+        default: ''
+      db_name:
+        description: 'DB Name'
+        required: true
+        default: ''
+      db_username:
+        description: 'DB Username'
+        required: true
+        default: ''
+      db_password:
+        description: 'DB Password'
+        required: true
+        default: ''
+      
+jobs:
+  deploy:
+    name: Deploy Serverless APP
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+        with:
+          php-version: '7.4'
+
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "DB_HOST="
+          replace: "DB_HOST=${{ github.event.inputs.db_server }}"
+          include: "**.env_remote"
+
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "DB_DATABASE="
+          replace: "DB_DATABASE=${{ github.event.inputs.db_name }}"
+          include: "**.env_remote"
+  
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "DB_USERNAME="
+          replace: "DB_USERNAME=${{ github.event.inputs.db_username }}"
+          include: "**.env_remote"
+
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "DB_PASSWORD="
+          replace: "DB_PASSWORD=${{ github.event.inputs.db_password }}"
+          include: "**.env_remote"
+
+      
+      - name: Service & App Code
+        run: |
+          echo "service="${{ github.event.repository.name }}-${{ github.event.inputs.app_code }} | sed 's/api-//g' >> $GITHUB_ENV
+          echo "app_code="${{ github.event.inputs.app_code }} | sed 's/api-//g' >> $GITHUB_ENV
+
+
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env_remote', '.env');" 
+
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+
+      - name: Serverless Deploy Stage
+        id: myRequest
+        uses: serverless/github-action@master
+        with:
+          # args: deploy --stage=dev --verbose
+          args: -c "serverless plugin install --name serverless-lift && serverless deploy  --stage=dev --verbose"
+          entrypoint: /bin/sh
+        env:
+          AWS_ACCESS_KEY_ID:  ${{ github.event.inputs.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ github.event.inputs.AWS_SECRET_ACCESS_KEY }}
+          SLS_DEBUG: 1
+
+      
+      - name: Export sls/aws-ec2 host
+        uses: serverless/github-action@master
+        with:
+          args: -c "serverless info --stage=dev --verbose | grep MyEndpointName | cut -c 19- > host.txt"
+          entrypoint: /bin/bash
+        env:
+          AWS_ACCESS_KEY_ID:  ${{ github.event.inputs.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ github.event.inputs.AWS_SECRET_ACCESS_KEY }}
+          SLS_DEBUG: 1
+
+
+      - name: Show site URL for review and testing
+        run: |
+          echo "host=$(cat host.txt)" >> $GITHUB_ENV
+
+      - name: API URL Setup Stage
+        id: myRequest2
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: "https://api.islaminfouk.com/invoice/api/update-apiurl/${{ github.event.inputs.app_code }}"
+          method: 'POST'
+          data: '{"app_api_url": "${{ env.host }}"}'
+
+      - name: API URL Setup Stage Response
+        run: |
+          echo ${{ steps.myRequest2.outputs.response }}
+      
+      - name: DB Setup Stage
+        id: myRequest1
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: "${{ env.host }}/db"
+          method: 'GET'
+      
+      - name: DB Setup Stage Response
+        run: |
+          echo ${{ steps.myRequest1.outputs.response }}
+
